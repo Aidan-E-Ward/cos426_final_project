@@ -1,6 +1,10 @@
 import dat from 'dat.gui';
 import { Scene, Color } from 'three';
 
+// Install information and other documentation from
+// https://github.com/schteppe/cannon.js.
+import C from 'cannon';
+
 import Flower from '../objects/Flower';
 import Land from '../objects/Land';
 import BasicLights from '../lights/BasicLights';
@@ -19,6 +23,8 @@ class SeedScene extends Scene {
         updateList: UpdateChild[];
     };
 
+    world;
+
     constructor() {
         // Call parent Scene() constructor
         super();
@@ -26,7 +32,7 @@ class SeedScene extends Scene {
         // Init state
         this.state = {
             gui: new dat.GUI(), // Create GUI for scene
-            rotationSpeed: 1,
+            rotationSpeed: 0,
             updateList: [],
         };
 
@@ -41,6 +47,11 @@ class SeedScene extends Scene {
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+
+        // Initializes the Cannon World, adapted from CannonJS tutorial
+        // https://tympanus.net/codrops/2019/12/10/building-a-physics-based-3d-menu-with-cannon-js-and-three-js/.
+        this.world = new C.World();
+        this.world.gravity.set(0, -100, 0);
     }
 
     addToUpdateList(object: UpdateChild): void {
