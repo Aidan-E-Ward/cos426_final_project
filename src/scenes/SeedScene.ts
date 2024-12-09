@@ -33,7 +33,7 @@ class SeedScene extends Scene {
         // Initializes the Cannon World, adapted from CannonJS tutorial
         // https://tympanus.net/codrops/2019/12/10/building-a-physics-based-3d-menu-with-cannon-js-and-three-js/.
         this.world = new C.World();
-        this.world.gravity.set(0, -0.01, 0);
+        this.world.gravity.set(0, -0.1, 0);
 
         // Init state
         this.state = {
@@ -50,7 +50,7 @@ class SeedScene extends Scene {
         const flower = new Flower(this);
         const pinball = new Pinball(this);
         const lights = new BasicLights();
-        this.add(land, flower, pinball, lights);
+        this.add(pinball, lights);
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);

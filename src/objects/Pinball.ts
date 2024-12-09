@@ -1,4 +1,11 @@
-import { Group, SphereGeometry, MeshPhongMaterial, Mesh, Vector3 } from 'three';
+import {
+    Group,
+    SphereGeometry,
+    MeshPhongMaterial,
+    Mesh,
+    Vector3,
+    MeshBasicMaterial,
+} from 'three';
 import SeedScene from '../scenes/SeedScene';
 
 // Install information and other documentation from
@@ -16,7 +23,7 @@ class Pinball extends Group {
         super();
         this.name = 'pinball';
 
-        const SPHERE_RADIUS = 10;
+        const SPHERE_RADIUS = 1;
 
         // Creates the mesh and body of the pinball, adapted from
         // https://threejs.org/docs/index.html?q=group#api/en/objects/Group,
@@ -25,14 +32,17 @@ class Pinball extends Group {
         const material = new MeshPhongMaterial({ color: 0x00ff00 });
         this.ball_mesh = new Mesh(geometry, material);
         this.ball_mesh.geometry.computeBoundingSphere();
-        const center = this.ball_mesh.geometry.boundingSphere?.center.clone() || new Vector3(0, 0, 0);
-        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining 
+        const center =
+            this.ball_mesh.geometry.boundingSphere?.center.clone() ||
+            new Vector3(1, 0, 0);
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
+        this.add(this.ball_mesh);
 
         console.log(center);
 
         const sphere = new C.Sphere(SPHERE_RADIUS);
         this.ball_body = new C.Body({
-            mass: 0,
+            mass: 10,
         });
         this.ball_body.addShape(
             sphere,
@@ -46,6 +56,8 @@ class Pinball extends Group {
     }
 
     update(): void {
+        // console.log(this.ball_body.position);
+        // console.log(this.ball_mesh.position);
         this.ball_mesh.position.set(
             this.ball_body.position.x,
             this.ball_body.position.y,
