@@ -35,7 +35,7 @@ class Pinball extends Group {
         const sphere = new C.Sphere(SPHERE_RADIUS);
         this.ball_body = new C.Body({
             mass: 10,
-            position: new C.Vec3(0, 5, 0),
+            position: new C.Vec3(2, 5, 1),
         });
         this.ball_body.addShape(sphere);
         this.ball_mesh.position.set(

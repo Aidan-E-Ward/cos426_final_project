@@ -34,6 +34,7 @@ class Table extends Group {
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
         this.add(this.box_mesh);
 
+        // Initializes the body.
         // takes in the box's half extents
         // The half extent of an Axis Aligned Bounding box represents half of the width, height and depth of the box
         const box = new C.Box(new C.Vec3(width / 2, height / 2, depth / 2));
@@ -42,7 +43,9 @@ class Table extends Group {
             position: new C.Vec3(0, 0, 0),
         });
         this.box_body.addShape(box);
-        this.box_body.quaternion.setFromEuler(0, -5.25, -0.5);
+        this.box_body.quaternion.setFromEuler(0, 0, 0);
+
+        // Sets the mesh position to the body position.
         this.box_mesh.position.set(
             this.box_body.position.x,
             this.box_body.position.y,
@@ -57,7 +60,6 @@ class Table extends Group {
         );
 
         parent.addToUpdateList(this);
-
         // console.log('addBody exists:', typeof parent.world.addBody === 'function');
         parent.world.addBody(this.box_body);
     }
