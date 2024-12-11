@@ -10,6 +10,7 @@ import C from 'cannon';
 import Pinball from '../objects/Pinball';
 import BasicLights from '../lights/BasicLights';
 import Table from '../objects/Table';
+import Paddle from '../objects/Paddle';
 
 // Define an object type which describes each object in the update list
 type UpdateChild = {
@@ -52,7 +53,8 @@ class SeedScene extends Scene {
         const pinball = new Pinball(this);
         const table = new Table(this);
         const lights = new BasicLights();
-        this.add(pinball, table, lights);
+        const paddleL = new Paddle(this);
+        this.add(pinball, table, lights, paddleL);
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
