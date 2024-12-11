@@ -1,17 +1,21 @@
-import { Group, 
-    Mesh, 
-    PlaneGeometry, 
+import {
+    Group,
+    Mesh,
+    PlaneGeometry,
     MeshStandardMaterial,
     BoxGeometry,
     Vector3,
     Quaternion,
 } from 'three';
-import { Body, Box, Vec3, } from 'cannon';
-import { createNoise2D } from 'simplex-noise';
+import { Body, Box, Vec3 } from 'cannon';
 import ChunkManager from './ChunkManager';
-import alea from 'alea';
 import SeedScene from '../scenes/SeedScene';
 
+// Define an object type which describes each object in the update list
+type UpdateChild = {
+    // Each object *might* contain an update function
+    update?: (timeStamp: number) => void;
+};
 
 class Chunk extends Group {
     terrainMesh: Mesh;
@@ -34,8 +38,9 @@ class Chunk extends Group {
             noiseScale: parent.state.noiseScale,
             noiseStrength: parent.state.noiseStrength,
             ringRadius: parent.state.ringRadius,
-            meshMaterial: parent.state.meshMaterial || new MeshStandardMaterial(),
-            updateList: [] as number[],
+            meshMaterial:
+                parent.state.meshMaterial || new MeshStandardMaterial(),
+            updateList: [] as UpdateChild[],
         };
 
         this.world = scene.world;
@@ -50,7 +55,12 @@ class Chunk extends Group {
     }
 
     createFlatTerrain(): Mesh {
-        const geometry = new PlaneGeometry(this.state.width, this.state.height, 1, 1);
+        const geometry = new PlaneGeometry(
+            this.state.width,
+            this.state.height,
+            1,
+            1
+        );
         const material = new MeshStandardMaterial({ color: 0x808080 });
 
         const mesh = new Mesh(geometry, material);
@@ -60,56 +70,35 @@ class Chunk extends Group {
         return mesh;
     }
 
-    generatePiles() {
+    generatePiles(): void {
         const pileCount = 10; // number of piles in a chunk
-        const pileSize = 3; //  number of cubes per pile
 
-        for (let i = 0; i < pileCount; i++) {
-            const pile = new Group();
-            const baseX = (Math.random() - 0.5) * this.state.width;
-            const baseZ = (Math.random()  - 0.5) * this.state.height;
-            const baseY = 0.5 // some y starting point
-
-            for (let j = 0; i < pileSize; j++) {
-                // some logic for generating the pile
-
-                const body = new Body({
-                    mass: 1,
-                    position: new Vec3(baseX, baseY + j, baseZ),
-                    shape: new Box(new Vec3(0.5, 0.5, 0.5)),
-                });
-                this.world.addBody(body);
-                this.pileBodies.push(body);
-            }
-
-            // somethng to push mesh onto the pileMeshes 
-            this.add(pile);
-        }
+        for (let i = 0; i < pileCount; i++) {}
     }
 
-    moveOnRing(speed: number) {
-        // Calculate the z position of the mesh based on its theta position in the ring
-        this.state.thetaOffset -= 0.001 * speed * 2 * Math.PI;
-        const thetaOffset = this.state.thetaOffset;
-        const mesh = this.terrainMesh;
-        const radius = this.state.ringRadius;
-        let chordThetaOff = 0;
-        
-        let alpha = (mesh.position.x)/(39*this.state.width)
-        chordThetaOff = 15* alpha * (2 * Math.PI) / 1000;
-        
-        mesh.position.x = radius * Math.sin(thetaOffset-chordThetaOff);
-        mesh.position.z = radius - radius * Math.cos(thetaOffset-chordThetaOff);
-        mesh.lookAt(0, 0, this.state.ringRadius);
-    }
+    // moveOnRing(speed: number) {
+    //     // Calculate the z position of the mesh based on its theta position in the ring
+    //     this.state.thetaOffset -= 0.001 * speed * 2 * Math.PI;
+    //     const thetaOffset = this.state.thetaOffset;
+    //     const mesh = this.terrainMesh;
+    //     const radius = this.state.ringRadius;
+    //     let chordThetaOff = 0;
+
+    //     let alpha = (mesh.position.x)/(39*this.state.width)
+    //     chordThetaOff = 15* alpha * (2 * Math.PI) / 1000;
+
+    //     mesh.position.x = radius * Math.sin(thetaOffset-chordThetaOff);
+    //     mesh.position.z = radius - radius * Math.cos(thetaOffset-chordThetaOff);
+    //     mesh.lookAt(0, 0, this.state.ringRadius);
+    // }
 
     explodePile(pileIndex: number) {
         const body = this.pileBodies[pileIndex];
-        body.applyImpulse(new Vec3(
-            x,
-            y,
-            z
-        ), body.position);
+        body.applyImpulse(new Vec3(x, y, z), body.position);
+    }
+
+    addToUpdateList(object: UpdateChild): void {
+        this.state.updateList.push(object);
     }
 
     update(timeStamp: number, speed: number): void {
@@ -123,7 +112,7 @@ class Chunk extends Group {
         //     obj.update(timeStamp);
         // }
 
-        this.world.step(1 / 60); 
+        this.world.step(1 / 60);
 
         this.pileBodies.forEach((body, index) => {
             const mesh = this.pileMeshes[index];
@@ -134,5 +123,3 @@ class Chunk extends Group {
 }
 
 export default Chunk;
-
-

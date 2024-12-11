@@ -1,18 +1,30 @@
 import { Group, BoxGeometry, MeshPhongMaterial, Object3D, Mesh } from 'three';
 // import { Vector3 } from 'three';
 import SeedScene from '../scenes/SeedScene';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 // Install information and other documentation from
 // https://github.com/schteppe/cannon.js.
 import C from 'cannon';
 
 class Paddle extends Group {
+    width = 0.25;
+    height = 0.75;
+    depth = 2;
 
-    width = 0.5;
-    height = 1;
-    depth = 4;
+    isLeftPaddle;
+
+    xInitPosition;
+    yInitPosition;
+    zInitPosition;
+    xInitRotation;
+    yInitRotation;
+    zInitRotation;
+
+    aPivotDirection;
+
+    impulseForce;
+    returnForce;
 
     paddle_body;
     paddle_mesh;
@@ -22,13 +34,37 @@ class Paddle extends Group {
     hinge_constraint;
     hinge_mesh;
 
-    constructor(parent: SeedScene) {
+    constructor(parent: SeedScene, isLeftPaddle: boolean) {
         super();
 
-        // Load object
-        const loader = new GLTFLoader();
-        this.name = 'paddle';
+        // Initializes the panel position and rotation depending on the input
+        this.isLeftPaddle = isLeftPaddle;
 
+        this.xInitPosition = 4;
+        this.yInitPosition = -0.5;
+        this.zInitPosition = 2;
+        this.xInitRotation = 0;
+        this.yInitRotation = 5.7;
+        this.zInitRotation = 0;
+
+        this.aPivotDirection = 1;
+
+        this.impulseForce = 5;
+        this.returnForce = -1;
+
+        if (!isLeftPaddle) {
+            this.zInitPosition = -2;
+            this.yInitRotation = -5.7;
+
+            this.aPivotDirection = -1;
+
+            this.impulseForce = -5;
+            this.returnForce = 0.5;
+        }
+
+        // Load object
+        // const loader = new GLTFLoader();
+        this.name = 'paddle';
 
         // Example from lightsaber project: https://github.com/arcturus3/lightsaber-dojo/blob/master/src/Lightsaber.ts
 
@@ -48,7 +84,7 @@ class Paddle extends Group {
         //     // console.log(gltf.scene.rotation);
         //     this.hilt = gltf.scene.clone();
         //     this.mesh.add(this.hilt);
-        
+
         // });
 
         // this.paddle_mesh = new Group();
@@ -73,11 +109,21 @@ class Paddle extends Group {
         // Initializes the body.
         this.paddle_body = new C.Body({
             mass: 1,
-            position: new C.Vec3(-5, 1, 0),
+            position: new C.Vec3(
+                this.xInitPosition,
+                this.yInitPosition,
+                this.zInitPosition
+            ),
         });
-        const paddleShape = new C.Box(new C.Vec3(this.width / 2, this.height / 2, this.depth / 2)); 
+        const paddleShape = new C.Box(
+            new C.Vec3(this.width / 2, this.height / 2, this.depth / 2)
+        );
         this.paddle_body.addShape(paddleShape);
-        this.paddle_body.quaternion.setFromEuler(0, 0, 0);
+        this.paddle_body.quaternion.setFromEuler(
+            this.xInitRotation,
+            this.yInitRotation,
+            this.zInitRotation
+        );
 
         // Sets the mesh position to the body position.
         this.paddle_mesh.position.set(
@@ -97,10 +143,12 @@ class Paddle extends Group {
         parent.addToUpdateList(this);
         parent.world.addBody(this.paddle_body);
 
-
-
         // Initializes the mesh.
-        const hingeGeometry = new BoxGeometry(this.width, this.height, this.depth);
+        const hingeGeometry = new BoxGeometry(
+            this.width,
+            this.height,
+            this.depth
+        );
         const hingeMaterial = new MeshPhongMaterial({ color: 0x000000 });
         this.hinge_mesh = new Mesh(hingeGeometry, hingeMaterial);
         this.hinge_mesh.geometry.computeBoundingBox();
@@ -109,11 +157,21 @@ class Paddle extends Group {
         // Initializes the body used for the hinge constraint.
         this.hinge_limit = new C.Body({
             mass: 0,
-            position: new C.Vec3(-5, 1, 0),
+            position: new C.Vec3(
+                this.xInitPosition,
+                this.yInitPosition,
+                this.zInitPosition
+            ),
         });
-        const hinge_shape = new C.Box(new C.Vec3(this.width / 2, this.height / 2, this.depth / 2)); 
+        const hinge_shape = new C.Box(
+            new C.Vec3(this.width / 2, this.height / 2, this.depth / 2)
+        );
         this.hinge_limit.addShape(hinge_shape);
-        this.hinge_limit.quaternion.setFromEuler(0, 0, 0);
+        this.hinge_limit.quaternion.setFromEuler(
+            this.xInitRotation,
+            this.yInitRotation,
+            this.zInitRotation
+        );
 
         // Sets the mesh position to the body position.
         this.hinge_mesh.position.set(
@@ -135,15 +193,26 @@ class Paddle extends Group {
 
         // Creates the hinge constraint, documentation from:
         // https://schteppe.github.io/cannon.js/docs/classes/HingeConstraint.html
-        this.hinge_constraint = new C.HingeConstraint(this.paddle_body, this.hinge_limit, {
-            pivotA: new C.Vec3(this.width, 0, this.depth / 2),
-            axisA: new C.Vec3(0, 1, 0),
-            pivotB: new C.Vec3(0, 0, this.depth / 2),
-            axisB: new C.Vec3(0, 1, 0)
-        });
+        this.hinge_constraint = new C.HingeConstraint(
+            this.paddle_body,
+            this.hinge_limit,
+            {
+                pivotA: new C.Vec3(
+                    this.width,
+                    0,
+                    (this.aPivotDirection * this.depth) / 2
+                ),
+                axisA: new C.Vec3(0, 1, 0),
+                pivotB: new C.Vec3(
+                    0,
+                    0,
+                    (this.aPivotDirection * this.depth) / 2
+                ),
+                axisB: new C.Vec3(0, 1, 0),
+            }
+        );
         parent.world.addConstraint(this.hinge_constraint);
         this.hinge_constraint.enable();
-
     }
 
     update(timeStamp: number): void {
@@ -176,10 +245,17 @@ class Paddle extends Group {
             hinge_rotation.z
         );
 
-        if (timeStamp % 10 <= 0.01 && timeStamp % 10 >= -0.01 ) {
-            this.paddle_body.applyLocalImpulse(new C.Vec3(20, 0, 0), new C.Vec3(0, 0, (this.depth / 2)));
+        if (Math.abs(timeStamp - Math.floor(timeStamp)) <= 0.001) {
+            this.paddle_body.applyLocalImpulse(
+                new C.Vec3(this.impulseForce, 0, 0),
+                new C.Vec3(0, 0, this.depth / 2)
+            );
         }
 
+        this.paddle_body.applyLocalForce(
+            new C.Vec3(this.returnForce, 0, 0),
+            new C.Vec3(0, 0, this.depth / 2)
+        );
     }
 }
 

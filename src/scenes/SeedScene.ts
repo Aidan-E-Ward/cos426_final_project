@@ -1,5 +1,5 @@
 import dat from 'dat.gui';
-import { Scene, Color } from 'three';
+import { Scene, Color, AxesHelper } from 'three';
 
 // Install information and other documentation from
 // https://github.com/schteppe/cannon.js.
@@ -35,7 +35,7 @@ class SeedScene extends Scene {
         // Initializes the Cannon World, adapted from CannonJS tutorial
         // https://tympanus.net/codrops/2019/12/10/building-a-physics-based-3d-menu-with-cannon-js-and-three-js/.
         this.world = new C.World();
-        this.world.gravity.set(0, -10, 0);
+        // this.world.gravity.set(5, -10, 0);
 
         // Init state
         this.state = {
@@ -50,14 +50,16 @@ class SeedScene extends Scene {
         // Add meshes to scene
         // const land = new Land();
         // const flower = new Flower(this);
+        const axesHelper = new AxesHelper(10);
         const pinball = new Pinball(this);
         const table = new Table(this);
         const lights = new BasicLights();
-        const paddleL = new Paddle(this);
-        this.add(pinball, table, lights, paddleL);
+        const paddleL = new Paddle(this, true);
+        const paddleR = new Paddle(this, false);
+        this.add(axesHelper, pinball, table, lights, paddleL, paddleR);
 
         // Populate GUI
-        this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+        // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
 
     addToUpdateList(object: UpdateChild): void {
