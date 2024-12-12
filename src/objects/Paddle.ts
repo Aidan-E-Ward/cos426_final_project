@@ -1,7 +1,7 @@
 import { Group, BoxGeometry, MeshPhongMaterial, Object3D, Mesh } from 'three';
 // import { Vector3 } from 'three';
 import SeedScene from '../scenes/SeedScene';
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 // Install information and other documentation from
 // https://github.com/schteppe/cannon.js.
@@ -63,7 +63,7 @@ class Paddle extends Group {
         }
 
         // Load object
-        // const loader = new GLTFLoader();
+        const loader = new GLTFLoader();
         this.name = 'paddle';
 
         // Example from lightsaber project: https://github.com/arcturus3/lightsaber-dojo/blob/master/src/Lightsaber.ts
@@ -88,16 +88,16 @@ class Paddle extends Group {
         // });
 
         // this.paddle_mesh = new Group();
-        // loader.load('models/paddle2.gltf', (gltf) => {
-        //     gltf.scene.scale.divideScalar(1);
-        //     gltf.scene.position.set(0,0,0);
-        //     // this.add(gltf.scene.clone());
+        // Paddle gltf file from:
+        // https://sketchfab.com/3d-models/simple-flippers-826010b553fa492db9104e26956b8873
+        loader.load('models/simple_flippers/scene.gltf', (gltf) => {
+            gltf.scene.scale.divideScalar(2);
+            gltf.scene.position.set(0, 0, 0);
+            // this.add(gltf.scene.clone());
 
-        //     console.log(gltf.scene.position);
-
-        //     this.paddle = gltf.scene.clone();
-        //     this.paddle_mesh.add(this.paddle);
-        // });
+            this.paddle = gltf.scene.clone();
+            this.paddle_mesh.add(this.paddle);
+        });
 
         // Initializes the mesh.
         const geometry = new BoxGeometry(this.width, this.height, this.depth);
