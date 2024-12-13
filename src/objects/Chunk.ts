@@ -48,7 +48,7 @@ class Chunk extends Group {
         this.scene = scene;
         this.parent = parent;
 
-        parent.addToUpdateList(this);
+        scene.addToUpdateList(this);
 
         this.terrainMesh = this.createFlatTerrain();
         this.add(this.terrainMesh);
