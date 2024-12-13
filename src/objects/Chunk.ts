@@ -10,6 +10,7 @@ import {
 import { Body, Box, Vec3 } from 'cannon';
 import ChunkManager from './ChunkManager';
 import SeedScene from '../scenes/SeedScene';
+import Pile from './Pile';
 
 // Define an object type which describes each object in the update list
 type UpdateChild = {
@@ -20,9 +21,9 @@ type UpdateChild = {
 class Chunk extends Group {
     terrainMesh: Mesh;
     state;
-    pileMeshes: Mesh[] = [];
-    pileBodies: Body[] = [];
+    piles: Pile[] = [];
     world;
+    scene;
 
     constructor(parent: ChunkManager, scene: SeedScene) {
         super();
@@ -44,6 +45,7 @@ class Chunk extends Group {
         };
 
         this.world = scene.world;
+        this.scene = scene;
         this.parent = parent;
 
         parent.addToUpdateList(this);
@@ -64,8 +66,6 @@ class Chunk extends Group {
         const material = new MeshStandardMaterial({ color: 0x808080 });
 
         const mesh = new Mesh(geometry, material);
-
-        mesh.rotation.x = -Math.PI / 2;
         mesh.position.y = 0;
         return mesh;
     }
@@ -73,7 +73,11 @@ class Chunk extends Group {
     generatePiles(): void {
         const pileCount = 10; // number of piles in a chunk
 
-        for (let i = 0; i < pileCount; i++) {}
+        for (let i = 0; i < pileCount; i++) {
+            const pile = new Pile(this, this.state.scene);
+            this.add(pile);
+            this.piles.push(pile);
+        }
     }
 
     // moveOnRing(speed: number) {
@@ -97,8 +101,14 @@ class Chunk extends Group {
         body.applyImpulse(new Vec3(x, y, z), body.position);
     }
 
-    addToUpdateList(object: UpdateChild): void {
-        this.state.updateList.push(object);
+    dispose(): void {
+        if (this.terrainMesh) {
+            this.remove(this.terrainMesh);
+            this.terrainMesh.geometry.dispose();
+        }
+
+        this.piles.forEach(pile => pile.dispose());
+        this.piles = [];
     }
 
     update(timeStamp: number, speed: number): void {
@@ -114,11 +124,7 @@ class Chunk extends Group {
 
         this.world.step(1 / 60);
 
-        this.pileBodies.forEach((body, index) => {
-            const mesh = this.pileMeshes[index];
-            mesh.position.copy(body.position as unknown as Vector3);
-            mesh.quaternion.copy(body.quaternion as unknown as Quaternion);
-        });
+        this.piles.forEach(pile => pile.update(timeStamp));
     }
 }
 

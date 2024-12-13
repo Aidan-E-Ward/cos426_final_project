@@ -9,6 +9,7 @@ import SeedScene from "../scenes/SeedScene";
 
 class ChunkManager extends Group {
     state;
+    parent: SeedScene;
 
     constructor(parent: SeedScene) {
         super();
@@ -57,33 +58,33 @@ class ChunkManager extends Group {
 
     removeChunk(chunk: Chunk) {
         this.remove(chunk.terrainMesh);
-        chunk.terrainMesh.geometry.dispose();
-        chunk.terrainMesh = undefined;
-        this.remove(chunk);
-    }
-
-    addToUpdateList(object: Object) {
-        this.state.updateList.push(object);
+        if (chunk.terrainMesh) {
+            chunk.terrainMesh.geometry.dispose();
+        }
+        const index = this.state.chunks.indexOf(chunk);
+        if (index > -1) {
+            this.state.chunks.splice(index, 1);
+        }
+        chunk.dispose();
     }
 
     update(timeStamp: number) {
         this.state.thetaOffset -= 0.001 * this.state.speed * 2 * Math.PI;
 
-        if (this.state.chunks.length < this.state.numChunks) {
+        while (this.state.chunks.length < this.state.numChunks) {
             this.addChunk();
         }
 
         if (this.state.chunks[0].terrainMesh.position.x < 0) {
-            const chunk = this.state.chunks.shift();
-            this.removeChunk(chunk);
+            this.removeChunk(this.state.chunks[0]);
         }
 
-        for (const chunk of this.state.chunks) {
-            chunk.update(timeStamp, this.state.speed, this.state.noiseStrength);
-        }
-       
+        this.state.chunks.forEach(chunk => chunk.update(timeStamp, this.state.speed));
     }
 
+    dispose() {
+        this.state.chunks.forEach(chunk => this.removeChunk(chunk));
+    }
     
 }
 
