@@ -7,7 +7,7 @@ import {
     Vector3,
     Quaternion,
 } from 'three';
-import { Body, Box, Vec3 } from 'cannon';
+import { Body, Box, Vec3, World } from 'cannon';
 import Chunk from './Chunk';
 import SeedScene from '../scenes/SeedScene';
 import { createNoise2D } from 'simplex-noise';
@@ -18,11 +18,13 @@ class Pile extends Group {
     state: {
         pileHeight: number;
         numCubes: number;
-        cubeArray: Cube[] | undefined,
+        cubeArray: Cube[],
+        position: Vector3,
+        isCubified: boolean,
     };
-    scene;
-    world;
-    parent;
+    scene: SeedScene;
+    world: World;
+    parent: Chunk;
     pileMesh: Mesh | undefined;
 
     constructor(parent: Chunk, scene: SeedScene) {
@@ -31,7 +33,9 @@ class Pile extends Group {
         this.state = {
             pileHeight: 1 + Math.floor(Math.random() * 10),
             numCubes: 0,
-            cubeArray: undefined,
+            cubeArray: [],
+            position: this.generateRandomPosition(),
+            isCubified: false,
         };
 
         this.world = scene.world;
@@ -43,6 +47,13 @@ class Pile extends Group {
         this.add(this.pileMesh);
     }
 
+    generateRandomPosition(): Vector3 {
+        const x = (Math.random() - 0.5) * this.parent.state.width;
+        const z = (Math.random() - 0.5) * this.parent.state.height;
+        const y = 0; // MUST CHANGE TO y-value of table surface
+        return new Vector3(x,y,z);
+    }
+
     createMesh(): Mesh {
         const baseX = Math.random() * this.parent.state.width;
         const baseZ = Math.random() * this.parent.state.height;
@@ -52,42 +63,43 @@ class Pile extends Group {
 
         const noise2D = createNoise2D();
 
-        function map(
-            val: number,
-            smin: number,
-            smax: number,
-            emin: number,
-            emax: number
-        ): number {
-            const t = (val - smin) / (smax - smin);
-            return (emax - emin) * t + emin;
-        }
+        // function map(
+        //     val: number,
+        //     smin: number,
+        //     smax: number,
+        //     emin: number,
+        //     emax: number
+        // ): number {
+        //     const t = (val - smin) / (smax - smin);
+        //     return (emax - emin) * t + emin;
+        // }
 
-        function noise(nx: number, nz: number): number {
-            // Re-map from -1.0:+1.0 to 0.0:1.0
-            return map(noise2D(nx, nz), -1, 1, 0, 1);
-        }
+        // function noise(nx: number, nz: number): number {
+        //     // Re-map from -1.0:+1.0 to 0.0:1.0
+        //     return map(noise2D(nx, nz), -1, 1, 0, 1);
+        // }
 
         // https://github.com/mwcooper/COS426FinalProject/blob/main/src/components/objects/Chunk/Chunk.js
-        function fbm(x: number, z: number) {
-            const octaves = 4;
-            const lacunarity = 2.0; // How quickly width shrinks
-            const gain = 0.5; // How slowly height shrinks
+        // function fbm(x: number, z: number) {
+        //     const octaves = 4;
+        //     const lacunarity = 2.0; // How quickly width shrinks
+        //     const gain = 0.5; // How slowly height shrinks
 
-            let freq = 1;
-            let amp = 1;
-            let y = 0;
-            let max = 0;
-            for (let i = 0; i < octaves; i++) {
-                y += amp * noise(x * freq, z * freq);
-                max += amp;
-                freq *= lacunarity;
-                amp *= gain;
-            }
-            return y / max;
-        }
+        //     let freq = 1;
+        //     let amp = 1;
+        //     let y = 0;
+        //     let max = 0;
+        //     for (let i = 0; i < octaves; i++) {
+        //         y += amp * noise(x * freq, z * freq);
+        //         max += amp;
+        //         freq *= lacunarity;
+        //         amp *= gain;
+        //     }
+        //     return y / max;
+        // }
+        const seed = this.parent.state.seed;
 
-        const geometry = new PlaneGeometry(radius, radius, 1, 1);
+        const geometry = new PlaneGeometry(radius, radius, 10, 10);
         const material = new MeshStandardMaterial({ color: 0x808080 });
 
         const position = geometry.attributes.position;
@@ -97,13 +109,11 @@ class Pile extends Group {
             const x = position.getX(i);
             const z = position.getZ(i);
 
-            const distance = Math.sqrt(
-                (baseX - x) * (baseX - x) + (baseZ - z) * (baseZ - z)
-            );
+            const distance = Math.sqrt(x * x + z * z);
             const falloff = Math.max(0, 1 - distance / (radius / 2)); // Falloff towards edges
 
             // Generate noise-based y-values
-            const noiseValue = fbm(x * 0.1, z * 0.1) * falloff * AMPLITUDE; // Combine FBM with falloff
+            const noiseValue = noise2D(x * 0.1, z * 0.1) * falloff * AMPLITUDE; // Combine FBM with falloff
             position.setY(i, baseY + noiseValue);
         }
 
@@ -113,55 +123,79 @@ class Pile extends Group {
         geometry.computeVertexNormals();
 
         const mesh = new Mesh(geometry, material);
+        mesh.position.set(this.state.position.x, 0, this.state.position.z);
 
         return mesh;
     }
 
     cubify(): void {
+        if (this.state.isCubified) return;
+
+        if (!this.pileMesh) return;
+
         const geo = this.pileMesh!.geometry;
 
         const position = geo.attributes.position;
 
         for (let i = 0; i < position.count; i++) {
-            const x = position.getX(i);
+            const x = position.getX(i); // do i have to do + this.pileMesh.position.x???
             const y = position.getY(i);
             const z = position.getZ(i);
 
             for (let j = 0; j < y; j++) {
-                let newY = y + -0.95 + 0.05;
-
-                // let geometry = new BoxGeometry(0.25, 0.25, 0.25);
-                // let material = new MeshStandardMaterial({ color:0x00ff00});
-
-                // let cubeMesh = new Mesh(geometry, material);
-
-                let newCube = new Cube(this.scene, new Vec3(x, newY, z));
-                this.add(newCube);
+                const cubePos = new Vec3(x, j * 0.25, z);
+                const cube = new Cube(this.scene, cubePos);
+                this.add(cube);
+                this.state.cubeArray.push(cube);
                 this.state.numCubes++;
             }
         }
 
         this.removeMesh();
+        this.state.isCubified = true;
     }
 
     removeMesh(): void {
-        if (!this.pileMesh) {
-            return;
-        }
-        this.remove(this.pileMesh);
-        this.pileMesh.geometry.dispose();
-        this.pileMesh = undefined;
-    }
-
-    removePile(): void {
         if (this.pileMesh) {
             this.remove(this.pileMesh);
             this.pileMesh.geometry.dispose();
             this.pileMesh = undefined;
-        } 
-        if ()
+        }
+    }
 
-            // add logic for removing cubes from the pile
+    update(timeStamp: number): void {
+        if (this.shouldCubify()) {
+            this.cubify(); // based on proximity to camera i believe
+        }
+
+        if (this.state.isCubified) {
+            this.state.cubeArray.forEach(cube => cube.update());
+        }
+        else {
+            // move the mesh ???
+        }
+    }
+
+    shouldCubify(): boolean {
+        const cameraPosition = ;
+        const distance = this.pileMesh?.position.distanceTo(cameraPisition): Infinity;
+        const cubifyDistance = 10;
+        return distance < cubifyDistance;
+    }
+
+    dispose(): void {
+        this.removeMesh();
+
+        this.state.cubeArray.forEach(cube => {
+            this.remove(cube);
+            cube.dispose();
+        })
+        this.state.cubeArray = [];
+
+        const index = this.parent.state.updateList.indexOf(this);
+        if (index > -1) {
+            this.parent.state.updateList.splice(index, 1);
+        }
     }
 }
 
