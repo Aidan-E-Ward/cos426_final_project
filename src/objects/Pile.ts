@@ -192,6 +192,7 @@ class Pile extends Group {
         })
         this.state.cubeArray = [];
 
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
         const index = this.parent.state.updateList.indexOf(this);
         if (index > -1) {
             this.parent.state.updateList.splice(index, 1);
