@@ -27,7 +27,7 @@ class Table extends Group {
 
         // ----------------------------------------------------------------------------------------
 
-        const floorWidth = 60;
+        const floorWidth = 100;
         const floorHeight = 0.1;
         const floorDepth = 15;
 

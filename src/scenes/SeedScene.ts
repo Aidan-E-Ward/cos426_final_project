@@ -28,7 +28,7 @@ class SeedScene extends Scene {
 
     world: C.World;
 
-    constructor() {
+    constructor(document: Document) {
         // Call parent Scene() constructor
         super();
 
@@ -54,8 +54,8 @@ class SeedScene extends Scene {
         const pinball = new Pinball(this);
         const table = new Table(this);
         const lights = new BasicLights();
-        const paddleL = new Paddle(this, true);
-        const paddleR = new Paddle(this, false);
+        const paddleL = new Paddle(this, document, true);
+        const paddleR = new Paddle(this, document, false);
         this.add(axesHelper, pinball, table, lights, paddleL, paddleR);
 
         // Populate GUI
