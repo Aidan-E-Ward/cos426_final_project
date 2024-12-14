@@ -1,11 +1,11 @@
 {
     "$schema": "https://json.schemastore.org/package.json",
     "repository": "cos426_final_project",
-    "name": "lower-case-dashed-name-of-project",
+    "name": "dynamic-pinball",
     "type": "module",
-    "version": "0.1.0",
-    "title": "PROJECT TITLE HERE",
-    "description": "SHORT DESCRIPTION OF PROJECT HERE. ONE TO TWO SENTENCES MAX",
+    "version": "1.0.0",
+    "title": "Dynamic Pinball",
+    "description": "In this game, the player plays pinball with dynamicly generated obstacles.",
     "keywords": [
         "Princeton",
         "graphics",
