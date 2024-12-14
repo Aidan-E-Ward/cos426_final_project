@@ -1,5 +1,5 @@
 // https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene
-import { Group, BoxGeometry, MeshPhongMaterial, Mesh } from 'three';
+import { Group, BoxGeometry, MeshPhongMaterial, Mesh, Color } from 'three';
 import SeedScene from '../scenes/SeedScene';
 
 // Install information and other documentation from
@@ -16,7 +16,11 @@ class Cube extends Group {
     hasCollided: boolean;
     counter: number;
 
-    constructor(parent: SeedScene, initPosition: C.Vec3) {
+    constructor(
+        parent: SeedScene,
+        initPosition: C.Vec3,
+        color: [number, number, number]
+    ) {
         // Call parent Group() constructor
         super();
 
@@ -33,7 +37,9 @@ class Cube extends Group {
         const depth = 0.2;
 
         const geometry = new BoxGeometry(width, height, depth);
-        const material = new MeshPhongMaterial({ color: 0x0ff0d0 });
+        const material = new MeshPhongMaterial({
+            color: new Color().setRGB(color[0], color[1], color[2]),
+        });
         this.cube_mesh = new Mesh(geometry, material);
         this.cube_mesh.geometry.computeBoundingBox();
         this.add(this.cube_mesh);

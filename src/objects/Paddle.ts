@@ -130,7 +130,7 @@ class Paddle extends Group {
 
         // Initializes the mesh.
         const geometry = new BoxGeometry(this.width, this.height, this.depth);
-        const material = new MeshPhongMaterial({ color: 0xff0000 });
+        const material = new MeshPhongMaterial({ color: 0xf28e10 });
         this.paddle_mesh = new Mesh(geometry, material);
         this.paddle_mesh.geometry.computeBoundingBox();
         this.add(this.paddle_mesh);
@@ -185,7 +185,7 @@ class Paddle extends Group {
             this.height,
             this.depth
         );
-        const hingeMaterial = new MeshPhongMaterial({ color: 0x000000 });
+        const hingeMaterial = new MeshPhongMaterial({ color: 0xffffff });
         this.hinge_mesh = new Mesh(hingeGeometry, hingeMaterial);
         this.hinge_mesh.geometry.computeBoundingBox();
         this.add(this.hinge_mesh);

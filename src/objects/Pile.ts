@@ -35,7 +35,7 @@ class Pile extends Group {
             cubeArray: [],
             position: this.generateRandomPosition(),
             isCubified: false,
-            radius: 2,
+            radius: Math.floor(Math.random() * 2) + 2,
             resolution: 7,
         };
 
@@ -63,7 +63,7 @@ class Pile extends Group {
 
     createMesh(): Mesh {
         const baseY = -0.9; // some y starting point
-        const AMPLITUDE = 15;
+        const AMPLITUDE = 20;
 
         const noise2D = createNoise2D();
 
@@ -117,6 +117,18 @@ class Pile extends Group {
 
         const position = geo.attributes.position;
 
+        let minY = Infinity;
+        let maxY = -Infinity;
+
+        for (let i = 0; i < position.count; i++) {
+            const y = this.state.position.y + Math.abs(position.getZ(i));
+            if (y <= 0.01) {
+                continue;
+            }
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+        }
+
         for (let i = 0; i < position.count; i++) {
             const x = this.state.position.x + position.getX(i);
             const y = this.state.position.z + position.getY(i);
@@ -129,7 +141,14 @@ class Pile extends Group {
                         j * (this.state.radius / this.state.resolution) - 0.3,
                         y
                     );
-                    const cube = new Cube(this.scene, cubePos);
+                    const normalizedY = (j - minY) / (maxY - minY);
+                    const color = this.interpolateColor(
+                        [0.25, 0.41, 0.88],
+                        [0.68, 0.85, 0.9],
+                        normalizedY
+                    );
+
+                    const cube = new Cube(this.scene, cubePos, color);
                     this.add(cube);
                     this.state.cubeArray.push(cube);
                     this.state.numCubes++;
@@ -138,6 +157,18 @@ class Pile extends Group {
         }
 
         this.state.isCubified = true;
+    }
+
+    interpolateColor(
+        color1: [number, number, number],
+        color2: [number, number, number],
+        factor: number
+    ): [number, number, number] {
+        return color1.map((c, i) => c + factor * (color2[i] - c)) as [
+            number,
+            number,
+            number,
+        ];
     }
 
     removeMesh(): void {
