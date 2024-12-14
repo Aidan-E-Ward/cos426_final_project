@@ -1,9 +1,10 @@
+// https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene
 import { Group, BoxGeometry, MeshPhongMaterial, Object3D, Mesh } from 'three';
-// import { Vector3 } from 'three';
 import SeedScene from '../scenes/SeedScene';
 
 // Install information and other documentation from
-// https://github.com/schteppe/cannon.js.
+// https://github.com/schteppe/cannon.js and
+// https://schteppe.github.io/cannon.js/.
 import C from 'cannon';
 
 // Process of parsing keyboard input for movement adapted from past COS 426 project:

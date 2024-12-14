@@ -1,12 +1,12 @@
 import dat from 'dat.gui';
+// https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene
 import { Scene, Color } from 'three';
 
 // Install information and other documentation from
-// https://github.com/schteppe/cannon.js.
+// https://github.com/schteppe/cannon.js and
+// https://schteppe.github.io/cannon.js/.
 import C from 'cannon';
 
-// import Flower from '../objects/Flower';
-// import Land from '../objects/Land';
 import Pinball from '../objects/Pinball';
 import BasicLights from '../lights/BasicLights';
 import Table from '../objects/Table';
@@ -45,7 +45,7 @@ class SeedScene extends Scene {
             score: 0,
         };
         this.document = document;
-        // Set background to a nice color
+        // Set background color
         this.background = new Color(0x000000);
 
         // Add meshes to scene
@@ -64,9 +64,6 @@ class SeedScene extends Scene {
 
     update(timeStamp: number): void {
         const { updateList } = this.state;
-
-        this.document.getElementById('totalScore')!.innerText =
-            this.state.score.toString();
 
         // Call update for each object in the updateList
         for (const obj of updateList) {

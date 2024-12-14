@@ -1,3 +1,4 @@
+// https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene
 import {
     Group,
     Mesh,
@@ -55,7 +56,6 @@ class Chunk extends Group {
     }
 
     generatePiles(): void {
-        // console.log('generating pile');
         const pileCount = 1; // number of piles in a chunk
 
         for (let i = 0; i < pileCount; i++) {
@@ -64,11 +64,6 @@ class Chunk extends Group {
             this.piles.push(pile);
         }
     }
-
-    // explodePile(pileIndex: number) {
-    //     const body = this.pileBodies[pileIndex];
-    //     body.applyImpulse(new Vec3(x, y, z), body.position);
-    // }
 
     dispose(): void {
         if (this.terrainMesh) {
@@ -81,20 +76,11 @@ class Chunk extends Group {
     }
 
     update(): void {
-        // const { updateList } = this.state;
-
-        // // Call update for each object in the updateList
-        // for (const obj of updateList) {
-        //     obj.update(timeStamp);
-        // }
-
         this.terrainMesh.position.set(
             this.terrainMesh.position.x + 0.05,
             this.terrainMesh.position.y,
             this.terrainMesh.position.z
         );
-
-        // this.piles.forEach((pile) => pile.update(timeStamp));
     }
 }
 

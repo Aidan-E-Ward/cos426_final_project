@@ -1,8 +1,10 @@
+// https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene
 import { Group, BoxGeometry, MeshPhongMaterial, Mesh } from 'three';
 import SeedScene from '../scenes/SeedScene';
 
 // Install information and other documentation from
-// https://github.com/schteppe/cannon.js.
+// https://github.com/schteppe/cannon.js and
+// https://schteppe.github.io/cannon.js/.
 import C from 'cannon';
 
 class Cube extends Group {
@@ -54,6 +56,8 @@ class Cube extends Group {
     }
 
     update(): void {
+        // after a certain length of time after collisions
+        // we can despawn the cube, this would count towards the user's score
         if (this.hasCollided) {
             this.counter++;
             if (this.counter >= 100) {
@@ -76,6 +80,8 @@ class Cube extends Group {
             this.cube_body.position.z
         );
 
+        // if the body position has differed at all from the initial,
+        // this would count as a displaced cube to contribute to the user's scoring
         if (
             !(
                 this.cube_body.position.y >= this.originY - 0.01 &&
@@ -86,13 +92,16 @@ class Cube extends Group {
         }
     }
 
+    // this method was intended to be used as a separate disposal method
+    // only to be called when the user scored a point by displacing the box themselves
+    // we couldn't get scoring to work on a time step by time step basis
     score(): void {
         this.parent.state.score++;
 
-        // Remove from physics world
+        // remove from physics world
         this.parent.world.remove(this.cube_body);
 
-        // Dispose mesh and geometry
+        // dispose mesh and geometry
         if (this.cube_mesh) {
             this.remove(this.cube_mesh);
             this.cube_mesh.geometry.dispose();
@@ -100,10 +109,10 @@ class Cube extends Group {
     }
 
     dispose(): void {
-        // Remove from physics world
+        // remove from physics world
         this.parent.world.remove(this.cube_body);
 
-        // Dispose mesh and geometry
+        // dispose mesh and geometry
         if (this.cube_mesh) {
             this.remove(this.cube_mesh);
             this.cube_mesh.geometry.dispose();

@@ -1,3 +1,4 @@
+// https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene
 import {
     Group,
     Mesh,
@@ -38,8 +39,6 @@ class Pile extends Group {
             resolution: 7,
         };
 
-        // console.log('constructing pile');
-
         this.world = scene.world;
         this.scene = scene;
 
@@ -58,51 +57,18 @@ class Pile extends Group {
             Math.random() * this.parent.state.height -
             this.parent.state.height / 2 +
             this.parent.terrainMesh.position.z;
-        const y = -0.95; // MUST CHANGE TO y-value of table surface
+        const y = -0.95; // y-value of table surface
         return new Vector3(x, y, z);
     }
 
     createMesh(): Mesh {
         const baseY = -0.9; // some y starting point
-        // const radius = 0.5 + Math.floor(Math.random() * 3);
         const AMPLITUDE = 15;
 
         const noise2D = createNoise2D();
 
-        // function map(
-        //     val: number,
-        //     smin: number,
-        //     smax: number,
-        //     emin: number,
-        //     emax: number
-        // ): number {
-        //     const t = (val - smin) / (smax - smin);
-        //     return (emax - emin) * t + emin;
-        // }
-
-        // function noise(nx: number, nz: number): number {
-        //     // Re-map from -1.0:+1.0 to 0.0:1.0
-        //     return map(noise2D(nx, nz), -1, 1, 0, 1);
-        // }
-
         // https://github.com/mwcooper/COS426FinalProject/blob/main/src/components/objects/Chunk/Chunk.js
-        // function fbm(x: number, z: number) {
-        //     const octaves = 4;
-        //     const lacunarity = 2.0; // How quickly width shrinks
-        //     const gain = 0.5; // How slowly height shrinks
-
-        //     let freq = 1;
-        //     let amp = 1;
-        //     let y = 0;
-        //     let max = 0;
-        //     for (let i = 0; i < octaves; i++) {
-        //         y += amp * noise(x * freq, z * freq);
-        //         max += amp;
-        //         freq *= lacunarity;
-        //         amp *= gain;
-        //     }
-        //     return y / max;
-        // }
+        // for inspiration with simplex-noise library
 
         const geometry = new PlaneGeometry(
             this.state.radius,
@@ -121,14 +87,14 @@ class Pile extends Group {
             const y = position.getY(i);
 
             const distance = Math.sqrt(x * x + y * y);
-            const falloff = Math.max(0, 1 - distance / (this.state.radius / 2)); // Falloff towards edges
+            const falloff = Math.max(0, 1 - distance / (this.state.radius / 2)); // Falloff towards edges to create piles concentrated
+            // in height around the center
 
             const noiseValue = noise2D(x * 0.1, y * 0.1) * falloff * AMPLITUDE;
             position.setZ(i, baseY + noiseValue);
         }
 
         position.needsUpdate = true;
-        // geo.colorsNeedUpdate = true;
 
         geometry.computeVertexNormals();
 
@@ -140,7 +106,6 @@ class Pile extends Group {
         );
         mesh.rotateX(-Math.PI / 2);
 
-        // console.log('creating mesh');
         return mesh;
     }
 
@@ -158,13 +123,6 @@ class Pile extends Group {
             const z = this.state.position.y + Math.abs(position.getZ(i));
 
             if (z >= 0.01) {
-                // const cubePos = new Vec3(x, z - 0.5, y);
-                // console.log(cubePos);
-                // const cube = new Cube(this.scene, cubePos);
-                // this.add(cube);
-                // this.state.cubeArray.push(cube);
-                // this.state.numCubes++;
-
                 for (let j = -0.9; j < z; j++) {
                     const cubePos = new Vec3(
                         x,
@@ -192,7 +150,7 @@ class Pile extends Group {
 
     update(): void {
         if (this.shouldCubify()) {
-            this.cubify(); // based on proximity to camera i believe
+            this.cubify();
         }
 
         this.state.cubeArray.forEach((cube) => cube.update());
@@ -224,12 +182,6 @@ class Pile extends Group {
 
     dispose(): void {
         this.removeMesh();
-
-        // this.state.cubeArray.forEach((cube) => {
-        //     this.remove(cube);
-        //     cube.dispose();
-        // });
-        // this.state.cubeArray = [];
 
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
         const index = this.scene.state.updateList.indexOf(this);

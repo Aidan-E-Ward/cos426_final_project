@@ -6,6 +6,7 @@
  * handles window resizes.
  *
  */
+// https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene
 import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 

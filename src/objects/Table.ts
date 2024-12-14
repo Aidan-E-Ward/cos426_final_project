@@ -1,9 +1,10 @@
+// https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene
 import { Group, BoxGeometry, MeshPhongMaterial, Mesh } from 'three';
-// import { Vector3 } from 'three';
 import SeedScene from '../scenes/SeedScene';
 
-// Install information and other documentation from
-// https://github.com/schteppe/cannon.js.
+// Install information and other documentation on Cannon.js from
+// https://github.com/schteppe/cannon.js and
+// https://schteppe.github.io/cannon.js/.
 import C from 'cannon';
 
 class Table extends Group {
@@ -19,8 +20,6 @@ class Table extends Group {
     rSlant_mesh: Mesh;
 
     constructor(parent: SeedScene) {
-        // console.log('World object:', parent.world);
-
         // Call parent Group() constructor
         super();
         this.name = 'table';
@@ -39,7 +38,7 @@ class Table extends Group {
             floorHeight,
             floorDepth
         );
-        const floor_material = new MeshPhongMaterial({ color: 0x0000ff });
+        const floor_material = new MeshPhongMaterial({ color: 0x537d90 });
         this.floor_mesh = new Mesh(floor_geometry, floor_material);
         this.floor_mesh.geometry.computeBoundingBox();
         this.add(this.floor_mesh);
@@ -250,8 +249,6 @@ class Table extends Group {
     }
 
     update(): void {
-        // console.log(this.ball_body.position);
-        // console.log(this.ball_mesh.position);
         this.floor_mesh.position.set(
             this.floor_body.position.x,
             this.floor_body.position.y,
