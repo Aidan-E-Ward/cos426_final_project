@@ -1,7 +1,6 @@
 import { Group, BoxGeometry, MeshPhongMaterial, Object3D, Mesh } from 'three';
 // import { Vector3 } from 'three';
 import SeedScene from '../scenes/SeedScene';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 // Install information and other documentation from
 // https://github.com/schteppe/cannon.js.
@@ -126,22 +125,7 @@ class Paddle extends Group {
             this.returnForce = 100;
         }
 
-        // Load object
-        const loader = new GLTFLoader();
         this.name = 'paddle';
-
-        // gltf file parsing adapted from past COS 426 project:
-        // https://github.com/arcturus3/lightsaber-dojo/blob/master/src/Lightsaber.ts
-        // Paddle gltf file from:
-        // https://sketchfab.com/3d-models/simple-flippers-826010b553fa492db9104e26956b8873
-        loader.load('models/simple_flippers/scene.gltf', (gltf) => {
-            gltf.scene.scale.divideScalar(1.8);
-            gltf.scene.position.set(0, 0, 0);
-            // this.add(gltf.scene.clone());
-
-            this.paddle = gltf.scene.clone();
-            this.paddle_mesh.add(this.paddle);
-        });
 
         // Initializes the mesh.
         const geometry = new BoxGeometry(this.width, this.height, this.depth);

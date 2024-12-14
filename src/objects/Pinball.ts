@@ -59,7 +59,7 @@ class Pinball extends Group {
         );
 
         this.ball_body.applyLocalForce(
-            new C.Vec3(17, -100, 0),
+            new C.Vec3(25, -100, 0),
             new C.Vec3(0, 0, 0)
         );
     }

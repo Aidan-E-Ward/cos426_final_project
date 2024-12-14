@@ -11,6 +11,7 @@ import Pinball from '../objects/Pinball';
 import BasicLights from '../lights/BasicLights';
 import Table from '../objects/Table';
 import Paddle from '../objects/Paddle';
+import ChunkManager from '../objects/ChunkManager';
 
 // Define an object type which describes each object in the update list
 type UpdateChild = {
@@ -56,7 +57,9 @@ class SeedScene extends Scene {
         const lights = new BasicLights();
         const paddleL = new Paddle(this, document, true);
         const paddleR = new Paddle(this, document, false);
-        this.add(axesHelper, pinball, table, lights, paddleL, paddleR);
+        // const chunk = new Chunk(this);
+        const manager = new ChunkManager(this);
+        this.add(axesHelper, pinball, table, lights, paddleL, paddleR, manager);
 
         // Populate GUI
         // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
