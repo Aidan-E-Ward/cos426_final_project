@@ -43,6 +43,8 @@ const onAnimationFrameHandler = (timeStamp: number) => {
     // Updates the Cannon physics world, adapted from
     // https://tympanus.net/codrops/2019/12/10/building-a-physics-based-3d-menu-with-cannon-js-and-three-js/.
     scene.world.step(1 / 60);
+    camera.position.set(10.2, 7.8, 0);
+    camera.lookAt(new Vector3(0, 0, 0));
     renderer.render(scene, camera);
     scene.update && scene.update(timeStamp);
     window.requestAnimationFrame(onAnimationFrameHandler);

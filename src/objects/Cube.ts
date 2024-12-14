@@ -87,6 +87,8 @@ class Cube extends Group {
     }
 
     score(): void {
+        this.parent.state.score++;
+
         // Remove from physics world
         this.parent.world.remove(this.cube_body);
 
