@@ -1,0 +1,11 @@
+Model Information:
+* title:	Simple Flippers
+* source:	https://sketchfab.com/3d-models/simple-flippers-826010b553fa492db9104e26956b8873
+* author:	Jenson_A (https://sketchfab.com/Jenson_A)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Simple Flippers" (https://sketchfab.com/3d-models/simple-flippers-826010b553fa492db9104e26956b8873) by Jenson_A (https://sketchfab.com/Jenson_A) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
