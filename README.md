@@ -1,6 +1,7 @@
 ## COS 426 Final Project: Dynamic Pinball – Vincent Etherton and Aidan Ward
 
 Play the game at the following link: [https://aidan-e-ward.github.io/cos426_final_project/](https://aidan-e-ward.github.io/cos426_final_project/)
+
 Note: Press Q or P to flick the left or right paddle respectively. Reload the page with Ctrl(Cmd) + R when the ball goes between the paddles.
 
 [Read Our Project Writeup](./writeup.pdf)
